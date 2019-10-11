@@ -2,7 +2,10 @@ import tkinter as tk
 import random as rd
 import time
 import os
-
+import msvcrt #Detecta teclado
+import keyboard
+from ctypes import windll
+#tecla = sys.stdin.read(1)
 canvas_w = 100
 canvas_h = 40
 lotes = 0
@@ -14,6 +17,13 @@ procesosTer = []
 nombres = ['José','Carlos','Carolina','Juan','Gerardo','Daniela']
 operaciones = ['+','-','*','/']
 global cambioLote
+
+tecla = 'a'
+
+P = 0x50  # Tecla 'p'
+C = 0x43  # Tecla 'c'
+E = 0x45  # Tecla 'e'
+I = 0x49  # Tecla 'i'
 
 #Definimos nuesta ventana, donde m  is el nombre de la ventana principal
 m = tk.Tk()
@@ -59,6 +69,8 @@ listboxProEj.pack(side = tk.LEFT)
 proTeLabel.pack(side = tk.LEFT)
 listboxProTe.pack(side = tk.LEFT)
 
+
+
 #Listas para los procesos
 listaEjecucion=[]
 listaTerminado=[]
@@ -74,6 +86,25 @@ class Proceso:
         self.pOper1 = pOper1
         self.pOper2	= pOper2
         self.nLote = nLote
+
+#tratando teclas
+def key(event):
+    #m.focus_set()
+    print ("pressed" + repr(event.char))
+    tecla = event.char
+    print(tecla)
+
+
+
+
+def callback(event):
+    #m.focus_set()
+    print ("clicked at" + str(event.x) + str(event.y))
+
+
+m.bind("<Key>", key)
+m.bind("<Button-1>", callback)
+#m.pack()
 
 #método para saber si hay o no texto
 def validarDatos():
@@ -178,9 +209,11 @@ def procesamientoLotes():
     procesoActual = procesos[cont]
     loteActual = procesoActual.nLote
 
-
+    #if keyboard.is_pressed('p'):
+     #   pausaSistema()
     #cambiarDeLista(listboxProES,listboxProEj)
     while(cont != len(procesos)):
+
         procesoActual = procesos[cont]
         if(cont > 0):
             enlistarEnListBoxEs(procesoActual,procesoActual.np, lotesFaltantes)
@@ -191,8 +224,11 @@ def procesamientoLotes():
             enlistarEnListBoxEs(procesos[cont+1],procesoActual.np, lotesFaltantes)
 
         for r in range(0,procesoActual.tme):
-            if (r == procesoActual.tme):
-                break
+            print(tecla)
+            if windll.user32.GetAsyncKeyState(P):
+                while True:
+                    if windll.user32.GetAsyncKeyState(C):
+                        break
             reloj += 1
             tiempoLabel.config(text='Tiempo:' + str(reloj))
             tiempoLabel.update()
@@ -220,6 +256,7 @@ def procesamientoLotes():
         else:
             guardarResultado(loteActual,procesoActual.np, 'Error en la operación: No se puede dividir por 0', cambiarLote)
         cambiarDeLista(listboxProEj,listboxProTe)
+     
         if "Restantes" in listboxProES.get(0):
             #Nnvalida
             print("algo")
@@ -229,15 +266,19 @@ def procesamientoLotes():
         cont += 1
         valido = True
 
+
     lotesLabel.config(text='Lotes restantes: 0')
     lotesLabel.update()
     procesos.clear()
 
 
+
 def realizarOperacion(operacion,operador1, operador2):
     resultado = 0
     resultadoT = 'vacio'
-    if (operacion== '+'):
+    if  windll.user32.GetAsyncKeyState(E):
+    	resultado='ERROR'
+    elif (operacion== '+'):
         #suma
         resultado = operador1 + operador2
         return str(resultado)
@@ -290,6 +331,15 @@ def actualizarReloj(reloj):
 def enlistarEnListbox():
 	listboxProES.delete(0,tk.END)
 
+def pausaSistema():
+    print("Presione 'c' para continuar...")
+    key = tecla
+    while key != 'c':
+        print("Estoy pausado" + repr(event.char))
+        if (key == 'c'):
+            print("algo")
+            break
+
 #guardamos los procesos en un text
 def guardarProcesos():
     contl = 1
@@ -319,6 +369,8 @@ def guardarResultado(loteActual, proceso, operacion, cambiar):
         f.writelines(f'Lote #{loteActual}\n')
     f.writelines(f'{proceso}.- Operación:{operacion} \n')
     f.close()
+
+
 
 #Loop infinito hasta que la aplicación se cierre
 m.mainloop()
