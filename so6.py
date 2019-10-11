@@ -141,7 +141,7 @@ def imprimeLista():
 def enlistarEnListBoxEs(procesoA,np,lote):
     listboxProES.delete(0,1)
     listboxProES.insert(tk.END, str(procesoA.np) + '. ' + procesoA.programador +','+ str(procesoA.pOper1) + procesoA.operacion + str(procesoA.pOper2) +','+ str(procesoA.tme) )
-    print(str(np) + '/' + str(lote))
+    #print(str(np) + '/' + str(lote))
     if (np != -1 and lote != -1):
         x = definirRestantes(np, lote)
         listboxProES.insert(tk.END, x)
@@ -173,6 +173,31 @@ def decrementarTme(listboxActual):
     n = n + str(int(numerito)-1)
     listboxActual.insert(tk.END, n)
 
+def encontrarUltimo(actual):
+    ultimoLote = 0
+    for p in range (0,len(procesos)):
+        print(p)
+        if procesos[p].nLote == procesos[actual].nLote:
+            #print(f'P-lote({p}): {procesos[p].nLote}, actual-lote({actual}): {procesos[actual].nLote}')
+            #Encontramos el ultimo
+            if (p+1) < len(procesos):
+                if procesos[p+1].nLote != procesos[actual].nLote:
+                    ultimoLote = p;
+                    #print(f'Ultimo: {ultimoLote}, actual: {actual}')
+                    break
+            else:
+                ultimoLote = p;
+                #print(f'Ultimo: {ultimoLote}, actual: {actual}')
+                break
+    return ultimoLote
+
+def moverProceso(ultimo, actual):
+    print(ultimo)
+    procesos.insert(ultimo+1,procesoA)
+    procesos.pop(actual)
+    for p in range(0,len(procesos)):
+        print(f'Iteracion: {p}, proceso: {procesos[p].np}')
+
 #Procesamiento de lotes. El while se realiza desde 0 hasta nuestra cantidad de Procesos
 #El for va desde 0 hasta el TME de el proceso actual
 #Dentro del for el reloj avanza por cada iteracion y se deberia actualizar en el tiempoLabel ---Alentar la listaEjecucion
@@ -196,6 +221,7 @@ def procesamientoLotes():
     while(cont != len(procesos)):
 
         procesoActual = procesos[cont]
+        print(procesoActual.np)
         if(cont > 0):
             enlistarEnListBoxEs(procesoActual,procesoActual.np, lotesFaltantes)
         elif(cont==0):
@@ -205,7 +231,7 @@ def procesamientoLotes():
             enlistarEnListBoxEs(procesos[cont+1],procesoActual.np, lotesFaltantes)
 
         for r in range(0,procesoActual.tme):
-            print(tecla)
+
             if windll.user32.GetAsyncKeyState(P):
                 while True:
                     if windll.user32.GetAsyncKeyState(C):
@@ -216,6 +242,7 @@ def procesamientoLotes():
                 break;
             if windll.user32.GetAsyncKeyState(I):
                 print("Interrupcion")
+                moverProceso(encontrarUltimo(cont),cont)
             reloj += 1
             tiempoLabel.config(text='Tiempo:' + str(reloj))
             tiempoLabel.update()
@@ -295,7 +322,7 @@ def cambiarLoteActual(nproceso, lotesFaltantes):
     #listboxProES.delete(1)
     #listboxProES.insert(tk.END, n)
     if nproceso % 6 == 0:
-        print('Comienza un nuevo lote')
+        #print('Comienza un nuevo lote')
         cambioLote = maxLote
         lotesFaltantes -= 1
         lotesLabel.config(text='Lotes restantes: ' + str(lotesFaltantes))
@@ -317,15 +344,6 @@ def actualizarReloj(reloj):
 #guardamos los procesos en la listbox inicial(espera)
 def enlistarEnListbox():
 	listboxProES.delete(0,tk.END)
-
-def pausaSistema():
-    print("Presione 'c' para continuar...")
-    key = tecla
-    while key != 'c':
-        print("Estoy pausado" + repr(event.char))
-        if (key == 'c'):
-            print("algo")
-            break
 
 #guardamos los procesos en un text
 def guardarProcesos():
