@@ -208,6 +208,8 @@ def procesamientoLotes():
     lotesFaltantes = obtenerNLotes(len(procesos))
     procesoActual = procesos[cont]
     loteActual = procesoActual.nLote
+    tipoError = ['ERROR', 'Error en la operación: No se puede dividir por 0']
+    te = 0
 
     #if keyboard.is_pressed('p'):
      #   pausaSistema()
@@ -229,6 +231,12 @@ def procesamientoLotes():
                 while True:
                     if windll.user32.GetAsyncKeyState(C):
                         break
+            if windll.user32.GetAsyncKeyState(E):
+                te = 0
+                valido = False
+                break;
+            if windll.user32.GetAsyncKeyState(I):
+                print("Interrupcion")
             reloj += 1
             tiempoLabel.config(text='Tiempo:' + str(reloj))
             tiempoLabel.update()
@@ -238,6 +246,7 @@ def procesamientoLotes():
             decrementarTme(listboxProEj)
             if (procesoActual.pOper2 == 0):
                 valido = False
+                te=1
                 break
         if (cont > 0 and cont+1 < len(procesos)):
             if (procesoActual.nLote == procesos[cont-1].nLote):
@@ -254,9 +263,9 @@ def procesamientoLotes():
             resultado = realizarOperacion(procesoActual.operacion, procesoActual.pOper1, procesoActual.pOper2)
             guardarResultado(loteActual,procesoActual.np, resultado, cambiarLote)
         else:
-            guardarResultado(loteActual,procesoActual.np, 'Error en la operación: No se puede dividir por 0', cambiarLote)
+            guardarResultado(loteActual,procesoActual.np, tipoError[te] , cambiarLote)
         cambiarDeLista(listboxProEj,listboxProTe)
-     
+
         if "Restantes" in listboxProES.get(0):
             #Nnvalida
             print("algo")
@@ -276,9 +285,8 @@ def procesamientoLotes():
 def realizarOperacion(operacion,operador1, operador2):
     resultado = 0
     resultadoT = 'vacio'
-    if  windll.user32.GetAsyncKeyState(E):
-    	resultado='ERROR'
-    elif (operacion== '+'):
+
+    if (operacion== '+'):
         #suma
         resultado = operador1 + operador2
         return str(resultado)
