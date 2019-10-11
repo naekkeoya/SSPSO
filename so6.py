@@ -2,8 +2,6 @@ import tkinter as tk
 import random as rd
 import time
 import os
-import msvcrt #Detecta teclado
-import keyboard
 from ctypes import windll
 #tecla = sys.stdin.read(1)
 canvas_w = 100
@@ -86,25 +84,6 @@ class Proceso:
         self.pOper1 = pOper1
         self.pOper2	= pOper2
         self.nLote = nLote
-
-#tratando teclas
-def key(event):
-    #m.focus_set()
-    print ("pressed" + repr(event.char))
-    tecla = event.char
-    print(tecla)
-
-
-
-
-def callback(event):
-    #m.focus_set()
-    print ("clicked at" + str(event.x) + str(event.y))
-
-
-m.bind("<Key>", key)
-m.bind("<Button-1>", callback)
-#m.pack()
 
 #método para saber si hay o no texto
 def validarDatos():
